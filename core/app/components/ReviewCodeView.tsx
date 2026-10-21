@@ -137,13 +137,13 @@ import { useCodeViewPlaceholderFile } from '../hooks/useCodeViewPlaceholderFile.
 import { Avatar } from './Avatar.tsx';
 import { Button } from './Button.tsx';
 import { DefinitionPopover } from './DefinitionPopover.tsx';
+import { DiffLineCountBadge } from './DiffLineCountBadge.tsx';
 import {
   RepositoryMarkdownEditor,
   type MarkdownDocumentEditorHandle,
 } from './MarkdownDocumentEditor.tsx';
 import { ReadOnlyMarkdownView } from './ReadOnlyMarkdownView.tsx';
 import { ResolvedThreadDisclosure } from './ResolvedThreadDisclosure.tsx';
-import { DiffLineCountBadge } from './Sidebar.tsx';
 import { useCopiedState } from './useCopiedState.ts';
 
 const emptyMarkdownPreviewSectionIds = new Set<string>();

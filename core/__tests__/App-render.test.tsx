@@ -694,6 +694,87 @@ test('sidebar commit button toggles back to tree when commit view is open', asyn
   container.remove();
 });
 
+test('history summarizes the selected commit independently of file and history filters', async () => {
+  let resolveCommit: ((state: RepositoryState) => void) | undefined;
+  const commitSource = { ref: 'aaa1111', type: 'commit' } satisfies ReviewSource;
+  const emptySource = { ref: 'bbb2222', type: 'commit' } satisfies ReviewSource;
+  const files = [
+    createChangedFile('src/app.ts'),
+    createChangedFile('tests/app.ts'),
+    createChangedFile('README.md'),
+  ];
+  window.codiff = createCodiffMock({
+    getRepositoryHistory: vi.fn(async () => ({
+      entries: [
+        {
+          author: 'Reviewer',
+          committedAt: Date.now(),
+          parents: [],
+          ref: commitSource.ref,
+          subject: 'Update tests',
+        },
+        {
+          author: 'Reviewer',
+          committedAt: Date.now(),
+          parents: [],
+          ref: emptySource.ref,
+          subject: 'Empty commit',
+        },
+      ],
+      root: '/repo',
+    })),
+    getRepositoryState: vi.fn((source?: ReviewSource) => {
+      if (source?.type === 'commit' && source.ref === commitSource.ref) {
+        return new Promise<RepositoryState>((resolve) => {
+          resolveCommit = resolve;
+        });
+      }
+      return Promise.resolve({
+        ...repositoryState,
+        files: source?.type === 'commit' ? [] : files,
+        source: source ?? repositoryState.source,
+      });
+    }),
+  });
+  await using app = await renderReact(<App />);
+  const total = () => app.container.querySelector('.sidebar-total-line-count')?.textContent;
+  await waitFor(() => expect(total()).toBe('+3-3'));
+  await setInputValue(app.container.querySelector<HTMLInputElement>('.sidebar-search')!, 'README');
+  await waitFor(() => expect(total()).toBe('+1-1'));
+  await act(async () =>
+    [...app.container.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
+      .find((button) => button.textContent === 'History')!
+      .click(),
+  );
+  await waitFor(() => expect(total()).toBe('+3-3'));
+  await setInputValue(app.container.querySelector<HTMLInputElement>('.sidebar-search')!, 'tests');
+  expect(total()).toBe('+3-3');
+  const breakdown = app.container.querySelector('.sidebar-summary-breakdown');
+  await act(async () =>
+    app.container.querySelector<HTMLButtonElement>('.history-entry[title="Update tests"]')!.click(),
+  );
+  expect(total()).toBeUndefined();
+  expect(app.container.querySelector('.sidebar-summary-breakdown')).toBe(breakdown);
+  expect(app.container.querySelector('.sidebar-summary-footer[aria-busy="true"]')).not.toBeNull();
+  await act(async () =>
+    resolveCommit!({ ...repositoryState, files: [files[1]], source: commitSource }),
+  );
+  await waitFor(() => expect(total()).toBe('+1-1'));
+  expect(
+    [...app.container.querySelectorAll('.sidebar-summary-breakdown > div')].map(
+      (row) => row.textContent,
+    ),
+  ).toEqual(['Prod+0-0', 'Tests+1-1', 'Other+0-0']);
+  await setInputValue(app.container.querySelector<HTMLInputElement>('.sidebar-search')!, '');
+  await act(async () =>
+    app.container.querySelector<HTMLButtonElement>('.history-entry[title="Empty commit"]')!.click(),
+  );
+  await waitFor(() =>
+    expect(app.container.querySelector('.sidebar-total-empty')?.textContent).toBe('—'),
+  );
+  expect(app.container.querySelector('.sidebar-summary-footer')).not.toBeNull();
+});
+
 test('repository reload restores the selected file when it still exists', async () => {
   const firstFile = createChangedFile('src/first.ts');
   const secondFile = createChangedFile('src/second.ts');

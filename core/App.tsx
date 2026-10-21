@@ -1962,6 +1962,7 @@ export default function App() {
           selectedPath={visibleSelectedPath}
           shareWalkthroughDisabled={walkthroughSharing}
           showWhitespace={showWhitespace}
+          summaryLoading={isSwitchingSource}
           viewed={viewed}
           walkthroughError={walkthroughError}
           walkthroughLoading={walkthroughLoading}

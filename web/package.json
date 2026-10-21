@@ -21,9 +21,9 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-error-boundary": "^6.1.6",
-    "react-fate": "^1.9.0",
+    "react-fate": "^1.10.1",
     "void": "^1.1.12",
-    "void-fate": "^1.9.0"
+    "void-fate": "^1.10.1"
   },
   "devDependencies": {
     "@rolldown/plugin-babel": "^0.2.4",
