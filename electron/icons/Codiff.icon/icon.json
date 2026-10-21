@@ -9,8 +9,8 @@
           "blend-mode": "normal",
           "fill": "automatic",
           "glass": false,
-          "image-name": "icon.png",
-          "name": "icon",
+          "image-name": "codiff.svg",
+          "name": "codiff",
           "position": {
             "scale": 1,
             "translation-in-points": [0, 0]
