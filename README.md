@@ -286,6 +286,8 @@ shim while the walkthrough sees the original conversation context without a loss
 
 ## Development
 
+Use Node.js 24.21.0 or later.
+
 ```bash
 vp install
 vp build
@@ -311,9 +313,7 @@ vp test
 vp build
 ```
 
-Run `vpr test:integration` to build and test the public sharing service in the local
-Cloudflare Workers runtime. The `test` workspace uses Vitest 4.1 for compatibility
-with `@cloudflare/vitest-plugin`; the main test suite uses Vitest 5.
+Run `vpr test:integration` to build and test the public sharing service.
 
 ## Contributing
 
